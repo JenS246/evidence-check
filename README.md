@@ -55,9 +55,9 @@ The repository includes `.github/workflows/pages.yml`.
 3. Under **Build and deployment**, select **GitHub Actions**.
 4. Push to `main` or run the Pages workflow from the **Actions** tab.
 
-Expected URLs after repository creation:
+Project URLs:
 
-- Source: `https://github.com/YOUR-USER/evidence-check`
-- Live game: `https://YOUR-USER.github.io/evidence-check/`
+- Source: <https://github.com/JenS246/evidence-check>
+- Live game: <https://jens246.github.io/evidence-check/>
 
 No backend or persistent data is used, so there is no data backup or restore procedure.
