@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Evidence Check is a quick classroom game introducing direct evidence, circumstantial evidence, and potential hearsay." />
+    <meta name="theme-color" content="#eee6d5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#24231f" media="(prefers-color-scheme: dark)" />
+    <title>Evidence Check</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --page: #eee6d5;
+        --paper: #fffaf0;
+        --paper-deep: #e5dac5;
+        --ink: #262923;
+        --muted: #656358;
+        --line: #393b34;
+        --accent: #a54432;
+        --accent-ink: #fffaf0;
+        --success: #23654b;
+        --success-soft: #dce9da;
+        --wrong: #9d3e33;
+        --wrong-soft: #f1d9d2;
+        --shadow: rgba(66, 56, 39, 0.18);
+        --radius: 12px;
+        --display: "Aptos Display", "Arial Narrow", "Roboto Condensed", Arial, sans-serif;
+        --body: Aptos, "Segoe UI", system-ui, sans-serif;
+        --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --page: #24231f;
+          --paper: #302f29;
+          --paper-deep: #3c3931;
+          --ink: #f2ecdf;
+          --muted: #c8c0af;
+          --line: #e6decd;
+          --accent: #e18069;
+          --accent-ink: #24231f;
+          --success: #91cfad;
+          --success-soft: #244438;
+          --wrong: #f09585;
+          --wrong-soft: #57332e;
+          --shadow: rgba(0, 0, 0, 0.28);
+        }
+      }
+
+      * { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+
+      html {
+        min-width: 320px;
+        background: var(--page);
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100dvh;
+        margin: 0;
+        overflow-x: hidden;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 8% 16%, color-mix(in srgb, var(--accent) 12%, transparent) 0 4.5rem, transparent 4.6rem),
+          linear-gradient(color-mix(in srgb, var(--ink) 5%, transparent) 1px, transparent 1px) 0 0 / 100% 2.2rem,
+          var(--page);
+        font-family: var(--body);
+      }
+
+      button { font: inherit; }
+
+      button:focus-visible,
+      [tabindex="-1"]:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 4px;
+      }
+
+      .decor {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .decor::before,
+      .decor::after {
+        content: "";
+        position: absolute;
+        border: 3px solid color-mix(in srgb, var(--accent) 52%, transparent);
+      }
+
+      .decor::before {
+        width: 10rem;
+        aspect-ratio: 1;
+        right: -4rem;
+        top: 12%;
+        border-radius: 50%;
+      }
+
+      .decor::after {
+        width: 8rem;
+        height: 4rem;
+        left: -3rem;
+        bottom: 8%;
+        transform: rotate(-11deg);
+      }
+
+      .app {
+        position: relative;
+        width: min(100%, 980px);
+        min-height: 100dvh;
+        margin: 0 auto;
+        padding: clamp(1rem, 2.8vw, 2rem);
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: clamp(1rem, 2.5vh, 1.6rem);
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .wordmark {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin: 0;
+        font-family: var(--display);
+        font-size: clamp(1.45rem, 4vw, 2.3rem);
+        font-stretch: condensed;
+        font-weight: 900;
+        letter-spacing: -0.045em;
+        line-height: 0.9;
+        text-transform: uppercase;
+      }
+
+      .wordmark-mark {
+        width: 1.55em;
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        border: 2px solid var(--line);
+        border-radius: 50%;
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-family: var(--mono);
+        font-size: 0.56em;
+        letter-spacing: -0.08em;
+        transform: rotate(-7deg);
+      }
+
+      .progress {
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: clamp(0.72rem, 2vw, 0.86rem);
+        font-weight: 700;
+        line-height: 1.35;
+        text-align: right;
+      }
+
+      .screen {
+        align-self: center;
+        width: min(100%, 820px);
+        margin: auto;
+      }
+
+      .paper-card {
+        position: relative;
+        border: 2px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+        box-shadow: 9px 9px 0 var(--shadow);
+      }
+
+      .paper-card::before {
+        content: "";
+        position: absolute;
+        top: -9px;
+        left: clamp(1.4rem, 10%, 4rem);
+        width: 4.5rem;
+        height: 1rem;
+        border: 1px solid color-mix(in srgb, var(--line) 28%, transparent);
+        background: color-mix(in srgb, var(--page) 65%, transparent);
+        transform: rotate(-2deg);
+      }
+
+      .intro-card,
+      .transition-card,
+      .complete-card {
+        padding: clamp(1.6rem, 5vw, 3.5rem);
+      }
+
+      .eyebrow {
+        margin: 0 0 0.55rem;
+        color: var(--accent);
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      h2, p { margin-top: 0; }
+
+      .intro-title,
+      .transition-title,
+      .complete-title {
+        max-width: 13ch;
+        margin-bottom: 1rem;
+        font-family: var(--display);
+        font-size: clamp(2.5rem, 8vw, 5.4rem);
+        font-weight: 900;
+        letter-spacing: -0.065em;
+        line-height: 0.88;
+        text-wrap: balance;
+        text-transform: uppercase;
+      }
+
+      .intro-copy,
+      .transition-copy,
+      .complete-copy {
+        max-width: 64ch;
+        margin-bottom: 1.4rem;
+        color: var(--muted);
+        font-size: clamp(1rem, 2vw, 1.18rem);
+        line-height: 1.55;
+      }
+
+      .primary-button,
+      .secondary-button,
+      .answer-button,
+      .next-button {
+        min-height: 3.5rem;
+        border: 2px solid var(--line);
+        border-radius: var(--radius);
+        cursor: pointer;
+        font-weight: 850;
+        transition: transform 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+      }
+
+      .primary-button,
+      .next-button {
+        padding: 0.85rem 1.35rem;
+        background: var(--accent);
+        color: var(--accent-ink);
+        box-shadow: 0 4px 0 var(--line);
+      }
+
+      .secondary-button {
+        padding: 0.85rem 1.35rem;
+        background: transparent;
+        color: var(--ink);
+        box-shadow: 0 4px 0 var(--line);
+      }
+
+      button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 var(--line);
+      }
+
+      button:active:not(:disabled) {
+        transform: translateY(2px) scale(0.99);
+        box-shadow: 0 1px 0 var(--line);
+      }
+
+      .basics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+        margin: 1.3rem 0 1.5rem;
+      }
+
+      .basic {
+        margin: 0;
+        padding-left: 0.9rem;
+        border-left: 4px solid var(--accent);
+        color: var(--muted);
+        font-size: 0.94rem;
+        line-height: 1.42;
+      }
+
+      .basic strong { color: var(--ink); }
+
+      .question-layout {
+        display: grid;
+        gap: clamp(0.75rem, 2vh, 1rem);
+      }
+
+      .question-card {
+        min-height: clamp(15rem, 38dvh, 21rem);
+        padding: clamp(1.5rem, 4.5vw, 3rem);
+        display: grid;
+        align-content: center;
+        gap: 1rem;
+        overflow: hidden;
+      }
+
+      .question-card::after {
+        content: "?";
+        position: absolute;
+        right: 1rem;
+        bottom: -2.2rem;
+        color: color-mix(in srgb, var(--accent) 15%, transparent);
+        font-family: var(--display);
+        font-size: clamp(7rem, 19vw, 11rem);
+        font-weight: 900;
+        line-height: 1;
+        transform: rotate(7deg);
+        pointer-events: none;
+      }
+
+      .fact-label {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        color: var(--accent);
+        font-family: var(--mono);
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .question-text {
+        position: relative;
+        z-index: 1;
+        max-width: 31ch;
+        margin: 0;
+        font-family: var(--display);
+        font-size: clamp(1.45rem, 4.1vw, 2.5rem);
+        font-weight: 850;
+        letter-spacing: -0.035em;
+        line-height: 1.12;
+        text-wrap: balance;
+      }
+
+      .answers {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.7rem;
+      }
+
+      .answer-button {
+        position: relative;
+        padding: 0.85rem 2.8rem 0.85rem 1rem;
+        background: var(--paper);
+        color: var(--ink);
+        box-shadow: 0 4px 0 var(--line);
+        font-size: clamp(0.95rem, 2.2vw, 1.08rem);
+      }
+
+      .key {
+        position: absolute;
+        top: 50%;
+        right: 0.8rem;
+        width: 1.6rem;
+        height: 1.6rem;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        transform: translateY(-50%);
+      }
+
+      .answer-button:disabled { cursor: default; opacity: 0.58; }
+      .answer-button.is-correct { background: var(--success-soft); opacity: 1; }
+      .answer-button.is-wrong { background: var(--wrong-soft); opacity: 1; }
+
+      .feedback {
+        min-height: 5.2rem;
+        padding: 0.9rem 1rem;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 1rem;
+        border: 2px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper-deep);
+      }
+
+      .feedback-title {
+        display: block;
+        margin-bottom: 0.2rem;
+        color: var(--success);
+        font-family: var(--display);
+        font-size: 1.12rem;
+        font-weight: 900;
+      }
+
+      .feedback.is-wrong .feedback-title { color: var(--wrong); }
+
+      .feedback-text {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.94rem;
+        line-height: 1.4;
+      }
+
+      .next-button { white-space: nowrap; }
+
+      .complete-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+
+      .review-panel {
+        margin-top: 1.3rem;
+        padding: 1rem;
+        border-left: 5px solid var(--accent);
+        background: var(--paper-deep);
+      }
+
+      .review-panel h3 {
+        margin: 0 0 0.7rem;
+        font-family: var(--display);
+        font-size: 1.3rem;
+      }
+
+      .review-panel dl { margin: 0; }
+      .review-panel dt { margin-top: 0.65rem; font-weight: 850; }
+      .review-panel dd { margin: 0.15rem 0 0; color: var(--muted); line-height: 1.42; }
+
+      @media (max-width: 620px) {
+        .app { gap: 0.75rem; }
+        .topbar { align-items: flex-start; }
+        .progress { font-size: 0.67rem; }
+        .intro-card, .transition-card, .complete-card { padding: 1.35rem; }
+        .basics { grid-template-columns: 1fr; }
+        .question-card { min-height: 15rem; }
+        .answers { grid-template-columns: 1fr; gap: 0.55rem; }
+        .answer-button { min-height: 3.25rem; }
+        .feedback { grid-template-columns: 1fr; gap: 0.65rem; }
+        .next-button { width: 100%; }
+      }
+
+      @media (max-height: 720px) and (min-width: 621px) {
+        .app { padding-block: 0.8rem; gap: 0.7rem; }
+        .question-card { min-height: 13.5rem; padding-block: 1.3rem; }
+        .question-text { font-size: clamp(1.35rem, 3.7vw, 2rem); }
+        .answer-button { min-height: 3rem; }
+        .feedback { min-height: 4.5rem; padding-block: 0.65rem; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="decor" aria-hidden="true"></div>
+
+    <main class="app">
+      <header class="topbar">
+        <h1 class="wordmark">
+          <span class="wordmark-mark" aria-hidden="true">EC</span>
+          <span>Evidence Check</span>
+        </h1>
+        <div id="progress" class="progress" aria-live="polite"></div>
+      </header>
+
+      <section id="intro-screen" class="screen" aria-labelledby="intro-title">
+        <article class="paper-card intro-card">
+          <p class="eyebrow">A quick classroom activity</p>
+          <h2 id="intro-title" class="intro-title">Evidence Check</h2>
+          <p class="intro-copy">Evidence helps us understand what happened. Sometimes evidence tells us something directly. Other times, we have to draw a conclusion from what we know. And sometimes, we need to think about whether someone is repeating what another person said. Let's practice!</p>
+          <button id="start-button" class="primary-button" type="button">Start</button>
+        </article>
+      </section>
+
+      <section id="round-one-screen" class="screen" aria-labelledby="round-one-title" hidden>
+        <article class="paper-card intro-card">
+          <p class="eyebrow">Round 1</p>
+          <h2 id="round-one-title" class="transition-title">Direct or Circumstantial?</h2>
+          <div class="basics">
+            <p class="basic"><strong>Direct evidence</strong> establishes a fact without requiring an inference. Example: “I saw someone break the window.”</p>
+            <p class="basic"><strong>Circumstantial evidence</strong> requires an inference. Example: someone leaves a room with broken glass on their shoes just after a window breaks.</p>
+          </div>
+          <button id="round-one-button" class="primary-button" type="button">Begin Round 1</button>
+        </article>
+      </section>
+
+      <section id="question-screen" class="screen" aria-label="Current question" hidden>
+        <div class="question-layout">
+          <article id="question-card" class="paper-card question-card" tabindex="-1">
+            <p id="fact-label" class="fact-label"></p>
+            <p id="question-text" class="question-text"></p>
+          </article>
+
+          <div id="answers" class="answers" aria-label="Choose the best answer"></div>
+
+          <div id="feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true" hidden>
+            <div>
+              <strong id="feedback-title" class="feedback-title"></strong>
+              <p id="feedback-text" class="feedback-text"></p>
+            </div>
+            <button id="next-button" class="next-button" type="button">Next</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="transition-screen" class="screen" aria-labelledby="transition-title" hidden>
+        <article class="paper-card transition-card">
+          <p class="eyebrow">Round 1 complete</p>
+          <h2 id="transition-title" class="transition-title">Next Up: Hearsay or Not?</h2>
+          <p class="transition-copy">Sometimes a witness tells us what someone else said. When a statement made outside of court is offered to prove that what the person said is true, it may be hearsay.</p>
+          <p class="transition-copy"><strong>Not every statement made outside of court is hearsay.</strong> What matters is why the statement is being offered.</p>
+          <button id="round-two-button" class="primary-button" type="button">Begin Round 2</button>
+        </article>
+      </section>
+
+      <section id="complete-screen" class="screen" aria-labelledby="complete-title" hidden>
+        <article class="paper-card complete-card">
+          <p class="eyebrow">Activity complete</p>
+          <h2 id="complete-title" class="complete-title">Nice Work!</h2>
+          <p class="complete-copy">You've practiced identifying direct evidence, circumstantial evidence, and potential hearsay. Remember, evidence doesn't always tell us everything directly. Sometimes we need to draw an inference, and sometimes we need to think about how someone's words are being used.</p>
+          <div class="complete-actions">
+            <button id="play-again-button" class="primary-button" type="button">Play Again</button>
+            <button id="review-button" class="secondary-button" type="button" aria-expanded="false" aria-controls="review-panel">Review the Basics</button>
+          </div>
+          <div id="review-panel" class="review-panel" hidden>
+            <h3>The three basics</h3>
+            <dl>
+              <dt>Direct evidence</dt>
+              <dd>Establishes a fact without an inference. Example: a witness says, “I saw the car hit the fence.”</dd>
+              <dt>Circumstantial evidence</dt>
+              <dd>Requires an inference. Example: fresh tire tracks lead from the road to a damaged fence.</dd>
+              <dt>Potential hearsay</dt>
+              <dd>An out-of-court statement offered to prove what it says is true. Example: “My neighbor told me the store was closed,” offered to prove the store was closed.</dd>
+            </dl>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const ROUNDS = [
+        {
+          name: "Round 1: Direct or Circumstantial?",
+          shortName: "Round 1",
+          answers: ["Direct Evidence", "Circumstantial Evidence"],
+          questions: [
+            {
+              fact: "Fact to prove: the driver ran the red light",
+              prompt: "A witness testifies, “I saw the driver run the red light.”",
+              answer: "Direct Evidence",
+              explanation: "The witness personally saw the driver run the light."
+            },
+            {
+              fact: "Fact to prove: it may be raining outside",
+              prompt: "A person walks into a building carrying a soaking wet umbrella.",
+              answer: "Circumstantial Evidence",
+              explanation: "The wet umbrella suggests it may be raining, but nobody in this example directly observed the rain."
+            },
+            {
+              fact: "Fact to prove: someone took the laptop",
+              prompt: "A security camera clearly records someone taking a laptop from a desk.",
+              answer: "Direct Evidence",
+              explanation: "The recording directly shows the person taking the laptop."
+            },
+            {
+              fact: "Fact to prove: a theft may have occurred",
+              prompt: "After closing, a store manager finds an empty cash drawer and a broken lock.",
+              answer: "Circumstantial Evidence",
+              explanation: "The empty drawer and broken lock suggest a theft, but they do not directly show it happening."
+            },
+            {
+              fact: "Fact to prove: Maya put the keys in the drawer",
+              prompt: "A coworker testifies, “I watched Maya place the keys in the top drawer.”",
+              answer: "Direct Evidence",
+              explanation: "The coworker personally saw Maya put the keys in the drawer."
+            },
+            {
+              fact: "Fact to prove: a package was delivered",
+              prompt: "A doorbell camera records a delivery driver placing the package on the front step.",
+              answer: "Direct Evidence",
+              explanation: "The recording directly shows the package being delivered."
+            },
+            {
+              fact: "Fact to prove: someone recently baked cookies",
+              prompt: "The kitchen is warm, a baking tray has fresh crumbs, and the room smells like cookies.",
+              answer: "Circumstantial Evidence",
+              explanation: "Those clues suggest that someone baked cookies, but they do not directly show the baking."
+            },
+            {
+              fact: "Fact to prove: the missing bike was taken through the gate",
+              prompt: "Fresh bicycle tire tracks lead from the empty bike rack through the muddy gate.",
+              answer: "Circumstantial Evidence",
+              explanation: "The tracks suggest how the bike left, but nobody directly saw it being taken through the gate."
+            }
+          ]
+        },
+        {
+          name: "Round 2: Hearsay or Not?",
+          shortName: "Round 2",
+          answers: ["Potential Hearsay", "Not Hearsay"],
+          questions: [
+            {
+              fact: "Purpose: to prove someone broke the window",
+              prompt: "A witness testifies, “My neighbor told me she saw someone break the window.”",
+              answer: "Potential Hearsay",
+              explanation: "The witness is repeating an out-of-court statement to prove what the statement says is true."
+            },
+            {
+              fact: "The witness describes a personal observation",
+              prompt: "A witness testifies, “I saw the window break.”",
+              answer: "Not Hearsay",
+              explanation: "The witness is describing something they personally observed, not repeating someone else's statement."
+            },
+            {
+              fact: "Purpose: to prove the store was closed",
+              prompt: "A witness testifies, “My friend told me the store was closed.”",
+              answer: "Potential Hearsay",
+              explanation: "The witness is repeating an out-of-court statement to establish that the store was closed."
+            },
+            {
+              fact: "Purpose: to explain why the witness moved",
+              prompt: "A witness testifies, “I heard the person shout, ‘Watch out!’” It is not offered to prove danger actually existed.",
+              answer: "Not Hearsay",
+              explanation: "The statement is used to explain the witness's reaction, not to prove the words were true."
+            },
+            {
+              fact: "Purpose: to prove the elevator was broken",
+              prompt: "A witness testifies, “The building manager told me the elevator was broken.”",
+              answer: "Potential Hearsay",
+              explanation: "The witness is repeating an out-of-court statement to prove that the elevator was broken."
+            },
+            {
+              fact: "Purpose: to explain why the witness used the east exit",
+              prompt: "A witness testifies, “A worker told me, ‘Use the east exit,’ so I went that way.”",
+              answer: "Not Hearsay",
+              explanation: "The instruction is used to explain the witness's action, not to prove that a fact stated in the instruction was true."
+            }
+          ]
+        }
+      ];
+
+      const screens = {
+        intro: document.querySelector("#intro-screen"),
+        roundOne: document.querySelector("#round-one-screen"),
+        question: document.querySelector("#question-screen"),
+        transition: document.querySelector("#transition-screen"),
+        complete: document.querySelector("#complete-screen")
+      };
+
+      const progress = document.querySelector("#progress");
+      const questionCard = document.querySelector("#question-card");
+      const factLabel = document.querySelector("#fact-label");
+      const questionText = document.querySelector("#question-text");
+      const answers = document.querySelector("#answers");
+      const feedback = document.querySelector("#feedback");
+      const feedbackTitle = document.querySelector("#feedback-title");
+      const feedbackText = document.querySelector("#feedback-text");
+      const nextButton = document.querySelector("#next-button");
+      const reviewButton = document.querySelector("#review-button");
+      const reviewPanel = document.querySelector("#review-panel");
+
+      let decks = [];
+      let roundIndex = 0;
+      let questionIndex = 0;
+      let answered = false;
+
+      function shuffle(items) {
+        const copy = [...items];
+        for (let index = copy.length - 1; index > 0; index -= 1) {
+          const randomIndex = Math.floor(Math.random() * (index + 1));
+          [copy[index], copy[randomIndex]] = [copy[randomIndex], copy[index]];
+        }
+        return copy;
+      }
+
+      function showScreen(name) {
+        Object.entries(screens).forEach(([key, element]) => {
+          element.hidden = key !== name;
+        });
+      }
+
+      function prepareGame() {
+        decks = ROUNDS.map((round) => shuffle(round.questions));
+        roundIndex = 0;
+        questionIndex = 0;
+        answered = false;
+        progress.textContent = "";
+        reviewPanel.hidden = true;
+        reviewButton.setAttribute("aria-expanded", "false");
+      }
+
+      function startGame() {
+        prepareGame();
+        showScreen("roundOne");
+        progress.textContent = "Two short rounds";
+        document.querySelector("#round-one-title").focus?.();
+      }
+
+      function startRound(index) {
+        roundIndex = index;
+        questionIndex = 0;
+        renderQuestion();
+        showScreen("question");
+        questionCard.focus();
+      }
+
+      function renderQuestion() {
+        const round = ROUNDS[roundIndex];
+        const question = decks[roundIndex][questionIndex];
+        answered = false;
+        factLabel.textContent = question.fact;
+        questionText.textContent = question.prompt;
+        feedback.hidden = true;
+        feedback.classList.remove("is-wrong");
+        answers.replaceChildren();
+
+        round.answers.forEach((answer, index) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "answer-button";
+          button.dataset.answer = answer;
+          button.innerHTML = `<span>${answer}</span><span class="key" aria-hidden="true">${index + 1}</span>`;
+          button.addEventListener("click", () => checkAnswer(answer, button));
+          answers.append(button);
+        });
+
+        progress.textContent = `${round.shortName}  |  ${questionIndex + 1} of ${round.questions.length}`;
+      }
+
+      function checkAnswer(choice, selectedButton) {
+        if (answered) return;
+        answered = true;
+        const question = decks[roundIndex][questionIndex];
+        const correct = choice === question.answer;
+
+        answers.querySelectorAll("button").forEach((button) => {
+          button.disabled = true;
+          if (button.dataset.answer === question.answer) button.classList.add("is-correct");
+        });
+
+        if (!correct) selectedButton.classList.add("is-wrong");
+        feedback.classList.toggle("is-wrong", !correct);
+        feedbackTitle.textContent = correct ? "Correct!" : `Not quite! The best answer is ${question.answer}.`;
+        feedbackText.textContent = question.explanation;
+        feedback.hidden = false;
+        nextButton.focus();
+      }
+
+      function nextQuestion() {
+        questionIndex += 1;
+        if (questionIndex < decks[roundIndex].length) {
+          renderQuestion();
+          questionCard.focus();
+          return;
+        }
+
+        if (roundIndex === 0) {
+          showScreen("transition");
+          progress.textContent = "Round 1 complete";
+          document.querySelector("#round-two-button").focus();
+          return;
+        }
+
+        showScreen("complete");
+        progress.textContent = "Activity complete";
+        document.querySelector("#play-again-button").focus();
+      }
+
+      document.querySelector("#start-button").addEventListener("click", startGame);
+      document.querySelector("#round-one-button").addEventListener("click", () => startRound(0));
+      document.querySelector("#round-two-button").addEventListener("click", () => startRound(1));
+      document.querySelector("#play-again-button").addEventListener("click", startGame);
+      nextButton.addEventListener("click", nextQuestion);
+
+      reviewButton.addEventListener("click", () => {
+        const willOpen = reviewPanel.hidden;
+        reviewPanel.hidden = !willOpen;
+        reviewButton.setAttribute("aria-expanded", String(willOpen));
+        reviewButton.textContent = willOpen ? "Hide Review" : "Review the Basics";
+        if (willOpen) reviewPanel.querySelector("h3").setAttribute("tabindex", "-1");
+        if (willOpen) reviewPanel.querySelector("h3").focus();
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (screens.question.hidden) return;
+        if (!answered && (event.key === "1" || event.key === "2")) {
+          const button = answers.querySelectorAll("button")[Number(event.key) - 1];
+          button?.click();
+        } else if (answered && event.key === "Enter") {
+          nextButton.click();
+        }
+      });
+
+      prepareGame();
+    </script>
+  </body>
+</html>
