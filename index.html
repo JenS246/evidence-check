@@ -4,47 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Evidence Check is a quick classroom game introducing direct evidence, circumstantial evidence, and potential hearsay." />
-    <meta name="theme-color" content="#eee6d5" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#24231f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#426f7d" />
     <title>Evidence Check</title>
     <style>
       :root {
-        color-scheme: light dark;
-        --page: #eee6d5;
+        color-scheme: light;
+        --page: #426f7d;
+        --page-deep: #315b68;
         --paper: #fffaf0;
-        --paper-deep: #e5dac5;
-        --ink: #262923;
-        --muted: #656358;
-        --line: #393b34;
-        --accent: #a54432;
+        --paper-deep: #f0e7d5;
+        --ink: #173143;
+        --muted: #53646a;
+        --line: #173143;
+        --accent: #a9482f;
         --accent-ink: #fffaf0;
-        --success: #23654b;
-        --success-soft: #dce9da;
-        --wrong: #9d3e33;
-        --wrong-soft: #f1d9d2;
-        --shadow: rgba(66, 56, 39, 0.18);
-        --radius: 12px;
+        --success: #21634b;
+        --success-soft: #d9e8dc;
+        --wrong: #963b30;
+        --wrong-soft: #f1d8d1;
+        --shadow: rgba(18, 47, 59, 0.28);
+        --radius: 11px;
         --display: "Aptos Display", "Arial Narrow", "Roboto Condensed", Arial, sans-serif;
         --body: Aptos, "Segoe UI", system-ui, sans-serif;
         --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --page: #24231f;
-          --paper: #302f29;
-          --paper-deep: #3c3931;
-          --ink: #f2ecdf;
-          --muted: #c8c0af;
-          --line: #e6decd;
-          --accent: #e18069;
-          --accent-ink: #24231f;
-          --success: #91cfad;
-          --success-soft: #244438;
-          --wrong: #f09585;
-          --wrong-soft: #57332e;
-          --shadow: rgba(0, 0, 0, 0.28);
-        }
       }
 
       * { box-sizing: border-box; }
@@ -62,8 +44,9 @@
         overflow-x: hidden;
         color: var(--ink);
         background:
-          radial-gradient(circle at 8% 16%, color-mix(in srgb, var(--accent) 12%, transparent) 0 4.5rem, transparent 4.6rem),
-          linear-gradient(color-mix(in srgb, var(--ink) 5%, transparent) 1px, transparent 1px) 0 0 / 100% 2.2rem,
+          linear-gradient(115deg, transparent 0 72%, rgba(255, 250, 240, 0.055) 72% 72.35%, transparent 72.35%),
+          repeating-linear-gradient(0deg, rgba(255, 250, 240, 0.035) 0 1px, transparent 1px 26px),
+          radial-gradient(circle at 8% 17%, rgba(214, 142, 89, 0.28) 0 74px, transparent 75px),
           var(--page);
         font-family: var(--body);
       }
@@ -72,8 +55,9 @@
 
       button:focus-visible,
       [tabindex="-1"]:focus-visible {
-        outline: 3px solid var(--accent);
-        outline-offset: 4px;
+        outline: 3px solid var(--paper);
+        outline-offset: 3px;
+        box-shadow: 0 0 0 6px var(--accent);
       }
 
       .decor {
@@ -87,34 +71,34 @@
       .decor::after {
         content: "";
         position: absolute;
-        border: 3px solid color-mix(in srgb, var(--accent) 52%, transparent);
+        border: 3px solid rgba(255, 250, 240, 0.2);
       }
 
       .decor::before {
-        width: 10rem;
+        width: 12rem;
         aspect-ratio: 1;
-        right: -4rem;
-        top: 12%;
+        right: -5rem;
+        top: 10%;
         border-radius: 50%;
       }
 
       .decor::after {
-        width: 8rem;
-        height: 4rem;
-        left: -3rem;
-        bottom: 8%;
-        transform: rotate(-11deg);
+        width: 9rem;
+        height: 4.5rem;
+        left: -3.5rem;
+        bottom: 7%;
+        transform: rotate(-10deg);
       }
 
       .app {
         position: relative;
-        width: min(100%, 980px);
+        width: min(100%, 1040px);
         min-height: 100dvh;
         margin: 0 auto;
-        padding: clamp(1rem, 2.8vw, 2rem);
+        padding: clamp(1rem, 2.6vw, 2rem);
         display: grid;
         grid-template-rows: auto 1fr;
-        gap: clamp(1rem, 2.5vh, 1.6rem);
+        gap: clamp(1rem, 2.5vh, 1.5rem);
       }
 
       .topbar {
@@ -122,7 +106,10 @@
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
+        color: var(--paper);
       }
+
+      body[data-screen="intro"] .topbar { display: none; }
 
       .wordmark {
         display: flex;
@@ -130,78 +117,84 @@
         gap: 0.65rem;
         margin: 0;
         font-family: var(--display);
-        font-size: clamp(1.45rem, 4vw, 2.3rem);
-        font-stretch: condensed;
+        font-size: clamp(1.35rem, 3.4vw, 2rem);
         font-weight: 900;
         letter-spacing: -0.045em;
-        line-height: 0.9;
+        line-height: 0.92;
         text-transform: uppercase;
       }
 
       .wordmark-mark {
-        width: 1.55em;
+        width: 1.6em;
         aspect-ratio: 1;
         display: grid;
         place-items: center;
         flex: 0 0 auto;
-        border: 2px solid var(--line);
+        border: 2px solid currentColor;
         border-radius: 50%;
         background: var(--accent);
         color: var(--accent-ink);
         font-family: var(--mono);
-        font-size: 0.56em;
+        font-size: 0.54em;
         letter-spacing: -0.08em;
         transform: rotate(-7deg);
       }
 
       .progress {
-        color: var(--muted);
+        color: var(--paper);
         font-family: var(--mono);
-        font-size: clamp(0.72rem, 2vw, 0.86rem);
-        font-weight: 700;
+        font-size: clamp(0.7rem, 1.8vw, 0.82rem);
+        font-weight: 800;
         line-height: 1.35;
         text-align: right;
       }
 
       .screen {
         align-self: center;
-        width: min(100%, 820px);
+        width: min(100%, 860px);
         margin: auto;
+        padding-block: 0.25rem 1rem;
       }
 
       .paper-card {
         position: relative;
         border: 2px solid var(--line);
         border-radius: var(--radius);
-        background: var(--paper);
-        box-shadow: 9px 9px 0 var(--shadow);
+        background:
+          linear-gradient(rgba(23, 49, 67, 0.032) 1px, transparent 1px) 0 0 / 100% 2rem,
+          var(--paper);
+        box-shadow: 10px 10px 0 var(--shadow);
       }
 
       .paper-card::before {
         content: "";
         position: absolute;
-        top: -9px;
-        left: clamp(1.4rem, 10%, 4rem);
-        width: 4.5rem;
-        height: 1rem;
-        border: 1px solid color-mix(in srgb, var(--line) 28%, transparent);
-        background: color-mix(in srgb, var(--page) 65%, transparent);
-        transform: rotate(-2deg);
+        top: -11px;
+        left: clamp(1.25rem, 8%, 3.5rem);
+        width: 5.25rem;
+        height: 1.15rem;
+        border: 2px solid var(--line);
+        border-bottom: 0;
+        border-radius: 7px 7px 0 0;
+        background: var(--paper-deep);
       }
 
       .intro-card,
       .transition-card,
       .complete-card {
-        padding: clamp(1.6rem, 5vw, 3.5rem);
+        padding: clamp(1.65rem, 5vw, 3.6rem);
       }
+
+      .intro-card { transform: rotate(-0.35deg); }
+      .transition-card { transform: rotate(0.25deg); }
 
       .eyebrow {
         margin: 0 0 0.55rem;
         color: var(--accent);
         font-family: var(--mono);
         font-size: 0.75rem;
-        font-weight: 800;
-        letter-spacing: 0.1em;
+        font-weight: 850;
+        letter-spacing: 0.09em;
         text-transform: uppercase;
       }
 
@@ -210,13 +203,13 @@
       .intro-title,
       .transition-title,
       .complete-title {
-        max-width: 13ch;
+        max-width: 14ch;
         margin-bottom: 1rem;
         font-family: var(--display);
-        font-size: clamp(2.5rem, 8vw, 5.4rem);
+        font-size: clamp(2.5rem, 7.5vw, 5.1rem);
         font-weight: 900;
-        letter-spacing: -0.065em;
-        line-height: 0.88;
+        letter-spacing: -0.06em;
+        line-height: 0.94;
         text-wrap: balance;
         text-transform: uppercase;
       }
@@ -224,10 +217,10 @@
       .intro-copy,
       .transition-copy,
       .complete-copy {
-        max-width: 64ch;
+        max-width: 61ch;
         margin-bottom: 1.4rem;
         color: var(--muted);
-        font-size: clamp(1rem, 2vw, 1.18rem);
+        font-size: clamp(1.05rem, 2vw, 1.22rem);
         line-height: 1.55;
       }
 
@@ -235,7 +228,7 @@
       .secondary-button,
       .answer-button,
       .next-button {
-        min-height: 3.5rem;
+        min-height: 3.55rem;
         border: 2px solid var(--line);
         border-radius: var(--radius);
         cursor: pointer;
@@ -245,15 +238,15 @@
 
       .primary-button,
       .next-button {
-        padding: 0.85rem 1.35rem;
+        padding: 0.85rem 1.45rem;
         background: var(--accent);
         color: var(--accent-ink);
         box-shadow: 0 4px 0 var(--line);
       }
 
       .secondary-button {
-        padding: 0.85rem 1.35rem;
-        background: transparent;
+        padding: 0.85rem 1.45rem;
+        background: var(--paper);
         color: var(--ink);
         box-shadow: 0 4px 0 var(--line);
       }
@@ -271,103 +264,96 @@
       .basics {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 0.8rem;
-        margin: 1.3rem 0 1.5rem;
+        gap: 1rem;
+        margin: 1.25rem 0 1.5rem;
       }
 
       .basic {
         margin: 0;
-        padding-left: 0.9rem;
-        border-left: 4px solid var(--accent);
+        padding: 0.1rem 0 0.1rem 1rem;
+        border-left: 5px solid var(--accent);
         color: var(--muted);
-        font-size: 0.94rem;
-        line-height: 1.42;
+        font-size: 0.98rem;
+        line-height: 1.48;
       }
 
       .basic strong { color: var(--ink); }
 
       .question-layout {
         display: grid;
-        gap: clamp(0.75rem, 2vh, 1rem);
+        gap: clamp(0.65rem, 1.6vh, 0.9rem);
       }
 
       .question-card {
-        min-height: clamp(15rem, 38dvh, 21rem);
-        padding: clamp(1.5rem, 4.5vw, 3rem);
+        padding: clamp(1.6rem, 4vw, 2.65rem);
         display: grid;
-        align-content: center;
-        gap: 1rem;
-        overflow: hidden;
+        gap: clamp(0.75rem, 1.8vh, 1rem);
       }
 
       .question-card::after {
-        content: "?";
+        content: "";
         position: absolute;
-        right: 1rem;
-        bottom: -2.2rem;
-        color: color-mix(in srgb, var(--accent) 15%, transparent);
-        font-family: var(--display);
-        font-size: clamp(7rem, 19vw, 11rem);
-        font-weight: 900;
-        line-height: 1;
-        transform: rotate(7deg);
-        pointer-events: none;
+        top: 0.8rem;
+        right: 0.85rem;
+        width: 1.4rem;
+        aspect-ratio: 1;
+        border-top: 2px solid var(--accent);
+        border-right: 2px solid var(--accent);
+        opacity: 0.5;
       }
 
-      .fact-label {
-        position: relative;
-        z-index: 1;
-        margin: 0;
-        color: var(--accent);
+      .question-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-right: 2rem;
+        color: var(--muted);
         font-family: var(--mono);
-        font-size: 0.76rem;
+        font-size: clamp(0.68rem, 1.5vw, 0.78rem);
         font-weight: 800;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
       }
 
+      .fact-label {
+        max-width: 70ch;
+        margin: 0;
+        padding: 0.6rem 0.75rem;
+        border-left: 5px solid var(--accent);
+        background: var(--paper-deep);
+        color: var(--ink);
+        font-size: clamp(0.9rem, 1.7vw, 1rem);
+        font-weight: 800;
+        line-height: 1.35;
+      }
+
+      .fact-label::first-letter { text-transform: uppercase; }
+
       .question-text {
-        position: relative;
-        z-index: 1;
-        max-width: 31ch;
+        max-width: 34ch;
         margin: 0;
         font-family: var(--display);
-        font-size: clamp(1.45rem, 4.1vw, 2.5rem);
+        font-size: clamp(1.55rem, 3.55vw, 2.35rem);
         font-weight: 850;
         letter-spacing: -0.035em;
-        line-height: 1.12;
-        text-wrap: balance;
+        line-height: 1.15;
+        text-wrap: pretty;
+        overflow-wrap: anywhere;
       }
 
       .answers {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.7rem;
+        gap: 0.75rem;
       }
 
       .answer-button {
-        position: relative;
-        padding: 0.85rem 2.8rem 0.85rem 1rem;
+        padding: 0.9rem 1rem;
         background: var(--paper);
         color: var(--ink);
         box-shadow: 0 4px 0 var(--line);
-        font-size: clamp(0.95rem, 2.2vw, 1.08rem);
-      }
-
-      .key {
-        position: absolute;
-        top: 50%;
-        right: 0.8rem;
-        width: 1.6rem;
-        height: 1.6rem;
-        display: grid;
-        place-items: center;
-        border: 1px solid var(--line);
-        border-radius: 6px;
-        color: var(--muted);
-        font-family: var(--mono);
-        font-size: 0.7rem;
-        transform: translateY(-50%);
+        font-size: clamp(1rem, 2vw, 1.12rem);
+        line-height: 1.2;
       }
 
       .answer-button:disabled { cursor: default; opacity: 0.58; }
@@ -375,10 +361,10 @@
       .answer-button.is-wrong { background: var(--wrong-soft); opacity: 1; }
 
       .feedback {
-        min-height: 5.2rem;
+        min-height: 6.35rem;
         padding: 0.9rem 1rem;
         display: grid;
-        grid-template-columns: 1fr auto;
+        grid-template-columns: minmax(0, 1fr) auto;
         align-items: center;
         gap: 1rem;
         border: 2px solid var(--line);
@@ -386,13 +372,19 @@
         background: var(--paper-deep);
       }
 
+      .feedback[hidden] {
+        display: grid !important;
+        visibility: hidden;
+      }
+
       .feedback-title {
         display: block;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.25rem;
         color: var(--success);
         font-family: var(--display);
-        font-size: 1.12rem;
+        font-size: 1.16rem;
         font-weight: 900;
+        line-height: 1.25;
       }
 
       .feedback.is-wrong .feedback-title { color: var(--wrong); }
@@ -400,11 +392,15 @@
       .feedback-text {
         margin: 0;
         color: var(--muted);
-        font-size: 0.94rem;
-        line-height: 1.4;
+        font-size: 0.96rem;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
       }
 
-      .next-button { white-space: nowrap; }
+      .next-button {
+        min-width: 7rem;
+        white-space: nowrap;
+      }
 
       .complete-actions {
         display: flex;
@@ -414,48 +410,73 @@
 
       .review-panel {
         margin-top: 1.3rem;
-        padding: 1rem;
+        padding: 1rem 1.1rem;
         border-left: 5px solid var(--accent);
+        border-radius: var(--radius);
         background: var(--paper-deep);
       }
 
       .review-panel h3 {
         margin: 0 0 0.7rem;
         font-family: var(--display);
-        font-size: 1.3rem;
+        font-size: 1.35rem;
       }
 
       .review-panel dl { margin: 0; }
-      .review-panel dt { margin-top: 0.65rem; font-weight: 850; }
-      .review-panel dd { margin: 0.15rem 0 0; color: var(--muted); line-height: 1.42; }
+      .review-panel dt { margin-top: 0.7rem; font-weight: 850; }
+      .review-panel dd { margin: 0.15rem 0 0; color: var(--muted); line-height: 1.48; }
 
       @media (max-width: 620px) {
-        .app { gap: 0.75rem; }
+        .app {
+          min-height: 100dvh;
+          padding: 0.85rem 0.8rem 1.5rem;
+          gap: 0.8rem;
+        }
+
         .topbar { align-items: flex-start; }
-        .progress { font-size: 0.67rem; }
-        .intro-card, .transition-card, .complete-card { padding: 1.35rem; }
+        .wordmark { font-size: 1.28rem; }
+        .progress { max-width: 12rem; font-size: 0.65rem; }
+        .screen { align-self: start; padding-top: 0.75rem; }
+        .intro-card, .transition-card, .complete-card { padding: 1.45rem 1.25rem; }
+        .intro-card, .transition-card { transform: none; }
+        .intro-title, .complete-title { font-size: clamp(2.35rem, 13vw, 3.8rem); }
+        .transition-title { max-width: 100%; font-size: clamp(2rem, 9vw, 3.4rem); overflow-wrap: anywhere; }
         .basics { grid-template-columns: 1fr; }
-        .question-card { min-height: 15rem; }
-        .answers { grid-template-columns: 1fr; gap: 0.55rem; }
-        .answer-button { min-height: 3.25rem; }
-        .feedback { grid-template-columns: 1fr; gap: 0.65rem; }
+        .question-card { padding: 1.45rem 1.15rem 1.3rem; }
+        .question-meta { padding-right: 1.5rem; }
+        .question-text { max-width: none; font-size: clamp(1.4rem, 7.2vw, 1.95rem); }
+        .answers { grid-template-columns: 1fr; gap: 0.6rem; }
+        .answer-button { min-height: 3.35rem; }
+        .feedback { min-height: 0; grid-template-columns: 1fr; gap: 0.75rem; }
+        .feedback[hidden] { min-height: 5.5rem; }
         .next-button { width: 100%; }
       }
 
-      @media (max-height: 720px) and (min-width: 621px) {
-        .app { padding-block: 0.8rem; gap: 0.7rem; }
-        .question-card { min-height: 13.5rem; padding-block: 1.3rem; }
-        .question-text { font-size: clamp(1.35rem, 3.7vw, 2rem); }
-        .answer-button { min-height: 3rem; }
-        .feedback { min-height: 4.5rem; padding-block: 0.65rem; }
+      @media (max-width: 360px) {
+        .wordmark span:last-child { max-width: 9ch; }
+        .question-meta { display: grid; gap: 0.15rem; }
+        .fact-label { font-size: 0.86rem; }
+        .complete-actions { display: grid; }
+      }
+
+      @media (max-height: 740px) and (min-width: 621px) {
+        .app { padding-block: 0.75rem; gap: 0.65rem; }
+        .screen { padding-bottom: 0.5rem; }
+        .question-card { padding-block: 1.25rem; gap: 0.6rem; }
+        .question-text { font-size: clamp(1.45rem, 3.1vw, 2rem); }
+        .answer-button { min-height: 3.15rem; padding-block: 0.7rem; }
+        .feedback { min-height: 5.25rem; padding-block: 0.65rem; }
       }
 
       @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+        *, *::before, *::after {
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
       }
     </style>
   </head>
-  <body>
+  <body data-screen="intro">
     <div class="decor" aria-hidden="true"></div>
 
     <main class="app">
@@ -469,9 +490,8 @@
 
       <section id="intro-screen" class="screen" aria-labelledby="intro-title">
         <article class="paper-card intro-card">
-          <p class="eyebrow">A quick classroom activity</p>
           <h2 id="intro-title" class="intro-title">Evidence Check</h2>
-          <p class="intro-copy">Evidence helps us understand what happened. Sometimes evidence tells us something directly. Other times, we have to draw a conclusion from what we know. And sometimes, we need to think about whether someone is repeating what another person said. Let's practice!</p>
+          <p class="intro-copy">Can you tell what kind of evidence you're looking at? Read each situation, choose an answer, and see how you did.</p>
           <button id="start-button" class="primary-button" type="button">Start</button>
         </article>
       </section>
@@ -479,10 +499,10 @@
       <section id="round-one-screen" class="screen" aria-labelledby="round-one-title" hidden>
         <article class="paper-card intro-card">
           <p class="eyebrow">Round 1</p>
-          <h2 id="round-one-title" class="transition-title">Direct or Circumstantial?</h2>
+          <h2 id="round-one-title" class="transition-title" tabindex="-1">Direct or Circumstantial?</h2>
           <div class="basics">
-            <p class="basic"><strong>Direct evidence</strong> establishes a fact without requiring an inference. Example: “I saw someone break the window.”</p>
-            <p class="basic"><strong>Circumstantial evidence</strong> requires an inference. Example: someone leaves a room with broken glass on their shoes just after a window breaks.</p>
+            <p class="basic"><strong>Direct evidence:</strong> Evidence that establishes a fact without requiring us to draw a conclusion from other facts. Example: “I saw someone break the window.”</p>
+            <p class="basic"><strong>Circumstantial evidence:</strong> Evidence that requires us to draw a conclusion from other facts. Example: broken glass on a person's shoes suggests they were near a broken window.</p>
           </div>
           <button id="round-one-button" class="primary-button" type="button">Begin Round 1</button>
         </article>
@@ -491,6 +511,10 @@
       <section id="question-screen" class="screen" aria-label="Current question" hidden>
         <div class="question-layout">
           <article id="question-card" class="paper-card question-card" tabindex="-1">
+            <div class="question-meta">
+              <span id="round-label"></span>
+              <span id="question-number"></span>
+            </div>
             <p id="fact-label" class="fact-label"></p>
             <p id="question-text" class="question-text"></p>
           </article>
@@ -510,17 +534,16 @@
       <section id="transition-screen" class="screen" aria-labelledby="transition-title" hidden>
         <article class="paper-card transition-card">
           <p class="eyebrow">Round 1 complete</p>
-          <h2 id="transition-title" class="transition-title">Next Up: Hearsay or Not?</h2>
-          <p class="transition-copy">Sometimes a witness tells us what someone else said. When a statement made outside of court is offered to prove that what the person said is true, it may be hearsay.</p>
-          <p class="transition-copy"><strong>Not every statement made outside of court is hearsay.</strong> What matters is why the statement is being offered.</p>
+          <h2 id="transition-title" class="transition-title" tabindex="-1">Next Up: Hearsay or Not?</h2>
+          <p class="transition-copy">Hearsay generally involves repeating something someone said outside of court to prove that what they said is true.</p>
+          <p class="transition-copy"><strong>Not every out-of-court statement is hearsay.</strong> It depends on why the statement is being used.</p>
           <button id="round-two-button" class="primary-button" type="button">Begin Round 2</button>
         </article>
       </section>
 
       <section id="complete-screen" class="screen" aria-labelledby="complete-title" hidden>
         <article class="paper-card complete-card">
-          <p class="eyebrow">Activity complete</p>
-          <h2 id="complete-title" class="complete-title">Nice Work!</h2>
+          <h2 id="complete-title" class="complete-title" tabindex="-1">Nice Work!</h2>
           <p class="complete-copy">You've practiced identifying direct evidence, circumstantial evidence, and potential hearsay. Remember, evidence doesn't always tell us everything directly. Sometimes we need to draw an inference, and sometimes we need to think about how someone's words are being used.</p>
           <div class="complete-actions">
             <button id="play-again-button" class="primary-button" type="button">Play Again</button>
@@ -555,10 +578,10 @@
               explanation: "The witness personally saw the driver run the light."
             },
             {
-              fact: "Fact to prove: it may be raining outside",
+              fact: "Fact to prove: it is raining outside",
               prompt: "A person walks into a building carrying a soaking wet umbrella.",
               answer: "Circumstantial Evidence",
-              explanation: "The wet umbrella suggests it may be raining, but nobody in this example directly observed the rain."
+              explanation: "The wet umbrella supports the conclusion that it is raining, but nobody in this example directly observed the rain."
             },
             {
               fact: "Fact to prove: someone took the laptop",
@@ -567,10 +590,10 @@
               explanation: "The recording directly shows the person taking the laptop."
             },
             {
-              fact: "Fact to prove: a theft may have occurred",
+              fact: "Fact to prove: someone stole cash from the store",
               prompt: "After closing, a store manager finds an empty cash drawer and a broken lock.",
               answer: "Circumstantial Evidence",
-              explanation: "The empty drawer and broken lock suggest a theft, but they do not directly show it happening."
+              explanation: "The empty drawer and broken lock support the conclusion that someone stole the cash, but they do not directly show the theft."
             },
             {
               fact: "Fact to prove: Maya put the keys in the drawer",
@@ -653,6 +676,8 @@
 
       const progress = document.querySelector("#progress");
       const questionCard = document.querySelector("#question-card");
+      const roundLabel = document.querySelector("#round-label");
+      const questionNumber = document.querySelector("#question-number");
       const factLabel = document.querySelector("#fact-label");
       const questionText = document.querySelector("#question-text");
       const answers = document.querySelector("#answers");
@@ -681,6 +706,7 @@
         Object.entries(screens).forEach(([key, element]) => {
           element.hidden = key !== name;
         });
+        document.body.dataset.screen = name;
       }
 
       function prepareGame() {
@@ -691,6 +717,7 @@
         progress.textContent = "";
         reviewPanel.hidden = true;
         reviewButton.setAttribute("aria-expanded", "false");
+        reviewButton.textContent = "Review the Basics";
       }
 
       function startGame() {
@@ -712,23 +739,25 @@
         const round = ROUNDS[roundIndex];
         const question = decks[roundIndex][questionIndex];
         answered = false;
+        roundLabel.textContent = round.name;
+        questionNumber.textContent = `Question ${questionIndex + 1} of ${round.questions.length}`;
         factLabel.textContent = question.fact;
         questionText.textContent = question.prompt;
         feedback.hidden = true;
         feedback.classList.remove("is-wrong");
         answers.replaceChildren();
 
-        round.answers.forEach((answer, index) => {
+        round.answers.forEach((answer) => {
           const button = document.createElement("button");
           button.type = "button";
           button.className = "answer-button";
           button.dataset.answer = answer;
-          button.innerHTML = `<span>${answer}</span><span class="key" aria-hidden="true">${index + 1}</span>`;
+          button.textContent = answer;
           button.addEventListener("click", () => checkAnswer(answer, button));
           answers.append(button);
         });
 
-        progress.textContent = `${round.shortName}  |  ${questionIndex + 1} of ${round.questions.length}`;
+        progress.textContent = `Round ${roundIndex + 1} of 2`;
       }
 
       function checkAnswer(choice, selectedButton) {
@@ -761,13 +790,13 @@
         if (roundIndex === 0) {
           showScreen("transition");
           progress.textContent = "Round 1 complete";
-          document.querySelector("#round-two-button").focus();
+          document.querySelector("#transition-title").focus();
           return;
         }
 
         showScreen("complete");
         progress.textContent = "Activity complete";
-        document.querySelector("#play-again-button").focus();
+        document.querySelector("#complete-title").focus();
       }
 
       document.querySelector("#start-button").addEventListener("click", startGame);
@@ -783,16 +812,6 @@
         reviewButton.textContent = willOpen ? "Hide Review" : "Review the Basics";
         if (willOpen) reviewPanel.querySelector("h3").setAttribute("tabindex", "-1");
         if (willOpen) reviewPanel.querySelector("h3").focus();
-      });
-
-      document.addEventListener("keydown", (event) => {
-        if (screens.question.hidden) return;
-        if (!answered && (event.key === "1" || event.key === "2")) {
-          const button = answers.querySelectorAll("button")[Number(event.key) - 1];
-          button?.click();
-        } else if (answered && event.key === "Enter") {
-          nextButton.click();
-        }
       });
 
       prepareGame();

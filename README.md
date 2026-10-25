@@ -14,8 +14,8 @@ The entire game is contained in `index.html`. The file includes:
 - Responsive HTML and CSS
 - The complete question banks in the `ROUNDS` JavaScript array
 - Randomization, answer feedback, round transitions, replay, and review behavior
-- Keyboard shortcuts (`1` and `2` to answer, then `Enter` to continue)
-- Visible focus styles, large tap targets, live feedback announcements, reduced-motion support, and system dark mode
+- Full keyboard navigation with standard `Tab`, `Space`, and `Enter` controls
+- Visible focus styles, large tap targets, live feedback announcements, and reduced-motion support
 
 The rounds always stay in order, but the questions within each round are shuffled each time the player starts again.
 
