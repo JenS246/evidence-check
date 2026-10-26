@@ -279,6 +279,14 @@
 
       .basic strong { color: var(--ink); }
 
+      .basics-reminder {
+        max-width: 65ch;
+        margin: -0.35rem 0 1.35rem;
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.48;
+      }
+
       .question-layout {
         display: grid;
         gap: clamp(0.65rem, 1.6vh, 0.9rem);
@@ -501,9 +509,10 @@
           <p class="eyebrow">Round 1</p>
           <h2 id="round-one-title" class="transition-title" tabindex="-1">Direct or Circumstantial?</h2>
           <div class="basics">
-            <p class="basic"><strong>Direct evidence:</strong> Evidence that establishes a fact without requiring us to draw a conclusion from other facts. Example: “I saw someone break the window.”</p>
-            <p class="basic"><strong>Circumstantial evidence:</strong> Evidence that requires us to draw a conclusion from other facts. Example: broken glass on a person's shoes suggests they were near a broken window.</p>
+            <p class="basic"><strong>Direct evidence:</strong> Evidence that shows a fact without needing to draw a conclusion from other facts. Example: “I saw someone break the window.”</p>
+            <p class="basic"><strong>Circumstantial evidence:</strong> Evidence that provides clues from which we can draw a conclusion about a fact. Example: broken glass on a person's shoes suggests they were near a broken window.</p>
           </div>
+          <p class="basics-reminder">Both types of evidence can be useful. Circumstantial evidence is not automatically weaker than direct evidence.</p>
           <button id="round-one-button" class="primary-button" type="button">Begin Round 1</button>
         </article>
       </section>
@@ -544,7 +553,7 @@
       <section id="complete-screen" class="screen" aria-labelledby="complete-title" hidden>
         <article class="paper-card complete-card">
           <h2 id="complete-title" class="complete-title" tabindex="-1">Nice Work!</h2>
-          <p class="complete-copy">You've practiced identifying direct evidence, circumstantial evidence, and potential hearsay. Remember, evidence doesn't always tell us everything directly. Sometimes we need to draw an inference, and sometimes we need to think about how someone's words are being used.</p>
+          <p class="complete-copy">You've practiced recognizing different kinds of evidence. Remember, some evidence shows us what happened directly, while other evidence requires us to draw conclusions. And when someone repeats another person's words, we need to think about why those words are being used.</p>
           <div class="complete-actions">
             <button id="play-again-button" class="primary-button" type="button">Play Again</button>
             <button id="review-button" class="secondary-button" type="button" aria-expanded="false" aria-controls="review-panel">Review the Basics</button>
@@ -553,9 +562,9 @@
             <h3>The three basics</h3>
             <dl>
               <dt>Direct evidence</dt>
-              <dd>Establishes a fact without an inference. Example: a witness says, “I saw the car hit the fence.”</dd>
+              <dd>Shows a fact without needing to draw a conclusion from other facts. Example: a witness says, “I saw the car hit the fence.”</dd>
               <dt>Circumstantial evidence</dt>
-              <dd>Requires an inference. Example: fresh tire tracks lead from the road to a damaged fence.</dd>
+              <dd>Provides clues from which we can draw a conclusion about a fact. Example: fresh tire tracks lead from the road to a damaged fence.</dd>
               <dt>Potential hearsay</dt>
               <dd>An out-of-court statement offered to prove what it says is true. Example: “My neighbor told me the store was closed,” offered to prove the store was closed.</dd>
             </dl>
@@ -602,10 +611,10 @@
               explanation: "The coworker personally saw Maya put the keys in the drawer."
             },
             {
-              fact: "Fact to prove: a package was delivered",
-              prompt: "A doorbell camera records a delivery driver placing the package on the front step.",
+              fact: "Fact to prove: the defendant said the meeting was canceled",
+              prompt: "A witness testifies, “I heard the defendant say the meeting was canceled.”",
               answer: "Direct Evidence",
-              explanation: "The recording directly shows the package being delivered."
+              explanation: "The witness personally heard the statement being made. The evidence directly establishes that the words were spoken, not necessarily that the meeting was actually canceled."
             },
             {
               fact: "Fact to prove: someone recently baked cookies",
